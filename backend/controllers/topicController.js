@@ -6,7 +6,7 @@ const ObjectId= mongoose.Schema.ObjectId;
 module.exports.createTopic = async (req, res) => {
   try {
     const { name, totalLectures } = req.body; // subjectId comes from route params
-    const { subjectId } = req.params; // subjectId is passed as part of the URL parameter
+    const subjectId  = new mongoose.Types.ObjectId(req.params.subjectId); // subjectId is passed as part of the URL parameter
     const topic = new Topic({ name, subject: subjectId, totalLectures, completedLectures: 0 });
     await topic.save();
     await Subject.findByIdAndUpdate(subjectId, { $push: { topics: topic._id } });
@@ -19,12 +19,13 @@ module.exports.createTopic = async (req, res) => {
 
 module.exports.getTopicsBySubject = async (req, res) => {
   try {
-     const topics = await Topic.find({ subjectId: req.params.subjectId });    
-      console.log(req.params.id);
-     if (!topics) {
+    const s_ID = new mongoose.Types.ObjectId(req.params.subjectId)
+     const subject = await Subject.findById(s_ID).populate("topics");
+
+     if (!subject.topics) {
       return res.status(404).json({ message: "No topics found for this subject" });
     }
-    res.status(200).json(topics);
+    res.status(200).json(subject.topics);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetching topics", error });
@@ -38,6 +39,12 @@ module.exports.updateTopic = async (req, res) => {
     if (!updatedTopic) {
       return res.status(404).json({ message: "Topic not found" });
     }
+    await Subject.findOneAndUpdate(
+      { _id: req.params.subjectId, "topics._id": req.params.id }, // Find subject containing the topic
+      { $set: { "topics.$.name": req.body.name } }, // Update specific field in the topic
+      { new: true }
+    );
+    
     res.status(200).json({ message: "Topic updated successfully", updatedTopic });
   } catch (error) {
     console.error(error);
@@ -45,14 +52,17 @@ module.exports.updateTopic = async (req, res) => {
   }
 };
 
+
+
 module.exports.deleteTopic = async (req, res) => {
   try {
-    const { subjectId, topicId } = req.params; // Get both subjectId and topicId from params
-    const deletedTopic = await Topic.findByIdAndDelete(topicId);
+    const { subjectId, id } = req.params;
+
+    await Subject.findByIdAndUpdate(subjectId, { $pull: { topics: id } });
+    const deletedTopic = await Topic.findByIdAndDelete(id);
     if (!deletedTopic) {
       return res.status(404).json({ message: "Topic not found" });
     }
-    await Subject.findByIdAndUpdate(subjectId, { $pull: { topics: topicId } }); // Remove the topic from the subject's list
     res.status(200).json({ message: "Topic deleted successfully" });
   } catch (error) {
     console.error(error);

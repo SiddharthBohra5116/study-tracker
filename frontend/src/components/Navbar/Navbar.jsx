@@ -4,7 +4,7 @@ import "./Navbar.css"; // Import the CSS file
 const Navbar = () => {
   return (
     <nav className="navbar">
-      <h1>📚 GATE Progress Tracker</h1>
+      <h1 className="nav-heading">📚 GATE Progress Tracker</h1>
       <div className="nav-links">
         <Link to="/" className="active">Dashboard</Link>
         <Link to="/dailytargets">Daily Targets</Link>

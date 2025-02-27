@@ -5,28 +5,20 @@ const { subjectsData } = require("./data");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb+srv://siddharthbohra5116:9s69mKq4HTtAeyST@cluster0.p7y7e.mongodb.net/study-tracker", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    await mongoose.connect("mongodb+srv://siddharthbohra5116:9s69mKq4HTtAeyST@cluster0.p7y7e.mongodb.net/study-tracker");
     console.log("MongoDB connected successfully");
 
-    await Subject.deleteMany(); // Clear existing data
-    await Topic.deleteMany();
+    await Subject.deleteMany(); // Clear existing subjects
+    await Topic.deleteMany(); // Clear existing topics
 
     for (const subject of subjectsData) {
       let totalLectures = 0;
       let completedLectures = 0;
-      let topicsArray = [];
+      let topicIds = [];
 
       for (const topic of subject.topics) {
         const newTopic = await Topic.create(topic);
-        topicsArray.push({
-          topicId: newTopic._id,
-          name: newTopic._id,
-          totalLectures: newTopic.totalLectures,
-          completedLectures: newTopic.completedLectures
-        });
+        topicIds.push(newTopic._id);
 
         totalLectures += newTopic.totalLectures;
         completedLectures += newTopic.completedLectures;
@@ -34,7 +26,7 @@ const connectDB = async () => {
 
       await Subject.create({
         name: subject.name,
-        topics: topicsArray,
+        topics: topicIds, // Store topic ObjectIds
         totalLectures,
         completedLectures
       });

@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Subject = require("../models/Subject");
 
 // Create a new subject
@@ -45,6 +46,7 @@ module.exports.getAllSubjects = async (req, res) => {
 // Get a specific subject by ID
 module.exports.getSubjectById = async (req, res) => {
   try {
+    const subjectId = new mongoose.Types.ObjectId(req.params.id)
     const subject = await Subject.findById(req.params.id).populate("topics");
 
     if (!subject) {

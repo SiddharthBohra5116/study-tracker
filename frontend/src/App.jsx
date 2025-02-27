@@ -1,30 +1,19 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar/Navbar";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import SubjectDetails from "./pages/SubjectDetails";
-import TopicDetails from "./pages/TopicDetails";
-import DailyTargets from "./pages/DailyTargets";
+import Subject from "./pages/Subject";
+import Navbar from "./components/Navbar/Navbar"
 
-function App() {
-  // const [subjects,setSubjects]=({});
+const App = () => {
   return (
-     <Router>
-      <Navbar />
+    <Router>
+      <Navbar/>
       <Routes>
         <Route path="/" element={<Home />} />
-        
-        </Routes>
-     </Router>
+        <Route path="/subject/:id" element={<Subject />} />
+      </Routes>
+    </Router>
   );
-}
-
-// function Buttons(){
-  
-  
-// }
+};
 
 export default App;
-{/* <Route path="/subject/:subjectId" element={<SubjectDetails />} />
-  <Route path="/subject/:subjectId/topic/:topicId" element={<TopicDetails />} />
-        <Route path="/daily-targets" element={<DailyTargets />} /> */}
-      

@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, "../frontend/dist")));
 // Routes
 app.use("/subjects", subjectRoutes);
 // app.use("/xyz/dailytargets",dailyTargetRoutes)
-app.use("/subjects/:id/topics", topicRoutes);
+app.use("/subjects/:subjectId/topics", topicRoutes);
 
 
 // Start the server

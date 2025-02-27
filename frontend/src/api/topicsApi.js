@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/subjects/:id/topics";
+const BASE_URL = "http://localhost:8080/subjects/:subjectId/topics";
 
 // Fetch topics for a subject
 // export const getTopicsBySubject = async (subjectId) => {
