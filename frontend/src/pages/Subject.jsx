@@ -81,14 +81,28 @@ const handleDeleteConfirm = async () => {
 
     const updatedTopics = subject.topics.filter(topic => topic._id !== selectedTopicId);
     setSubject({ ...subject, topics: updatedTopics });
-    updateLectureCounts({ topics: updatedTopics }); // Update total lectures after deletion
+    console.log("Updated Topics:", updatedTopics); // Log updated topics
+    const newTotalLectures = updatedTopics.reduce((total, topic) => total + topic.totalLectures, 0); // Calculate new total lectures count
+    console.log("New Total Lectures:", newTotalLectures); // Log new total lectures
+    setTotalLectures(newTotalLectures); // Update total lectures count
     setIsDeleteModalOpen(false);
+    setTimeout(() => {
+    setTimeout(() => {
+        console.log("Total Lectures after deletion:", totalLectures); // Log total lectures after deletion
+    }, 0);
+
+    }, 0);
+
+
+
+
 
 };
 
 const handleEdit = (topic) => {
     setEditingTopic(topic);
     setIsModalOpen(true);
+
   };
 
   const handleEditSubmit = async (e) => {

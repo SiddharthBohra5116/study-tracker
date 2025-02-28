@@ -1,7 +1,12 @@
 import React from "react";
 
 const EditTopicModal = ({ isOpen, onClose, topic, onEdit }) => {
-  const [editingTopic, setEditingTopic] = React.useState(topic ? { ...topic } : { name: "", totalLectures: 0, completedLectures: 0 });
+  const [editingTopic, setEditingTopic] = React.useState(topic || { name: "", totalLectures: 0, completedLectures: 0 });
+
+  React.useEffect(() => {
+    setEditingTopic(topic);
+  }, [topic]);
+
 
 
 
@@ -12,7 +17,8 @@ const EditTopicModal = ({ isOpen, onClose, topic, onEdit }) => {
   };
 
 
-  if (!isOpen || !topic) return null;
+  if (!isOpen || !editingTopic) return null;
+
 
 
   return (
