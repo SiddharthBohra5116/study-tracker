@@ -17,7 +17,7 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB Connection
-const MONGO_URL = process.env.MONGO_URL || "mongodb+srv://siddharthbohra5116:9s69mKq4HTtAeyST@cluster0.p7y7e.mongodb.net/study-tracker";
+const MONGO_URL = "mongodb+srv://siddharthbohra5116:9s69mKq4HTtAeyST@cluster0.p7y7e.mongodb.net/study-tracker";
 mongoose
   .connect(MONGO_URL)
   .then(() => console.log("Connected to MongoDB"))
