@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
+import TopicTable from "../components/TopicTable";
+import AddTopicModal from "../components/AddTopicModal";
+import EditTopicModal from "../components/EditTopicModal";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
+
 import { useParams } from "react-router-dom";
 import { getSubjectById } from "../api/subjectApi";
-import { updateTopic, deleteTopic } from "../api/topicsApi";
+import { updateTopic, deleteTopic, createTopic } from "../api/topicsApi";
+
 import CircularProgressBar from "../components/ProgressBar";
-import { ArrowUp, Pencil, Trash2 } from "lucide-react";
 import "../css/Subject.css";
+import "../css/table.css"
 
 const Subject = () => {
   const { id } = useParams();
@@ -70,11 +76,17 @@ const Subject = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    deleteTopic(selectedTopicId);
+const handleDeleteConfirm = async () => {
+    await deleteTopic(subject._id, selectedTopicId); // Ensure subject ID is passed
+
+    const updatedTopics = subject.topics.filter(topic => topic._id !== selectedTopicId);
+    setSubject({ ...subject, topics: updatedTopics });
+    updateLectureCounts({ topics: updatedTopics }); // Update total lectures after deletion
     setIsDeleteModalOpen(false);
-  };
-  const handleEdit = (topic) => {
+
+};
+
+const handleEdit = (topic) => {
     setEditingTopic(topic);
     setIsModalOpen(true);
   };
@@ -90,17 +102,18 @@ const Subject = () => {
     await updateTopic(editingTopic._id, editingTopic);
   };
 
-  const handleAddTopic = async (newTopic) => {
+const handleAddTopic = async (newTopic) => {
     try {
-      const response = await addTopic(subject._id, newTopic);
-      if (response.success) {
-        // Fetch updated data from backend and update state
-        const updatedSubject = await fetchSubject(subject._id);
-        setSubject(updatedSubject);
-      }
+        const response = await createTopic(subject._id, newTopic);
+        if (response.success) {
+            const updatedTopics = [...subject.topics, response.topic]; // Add the new topic to the existing topics
+            setSubject({ ...subject, topics: updatedTopics }); // Update the subject state with the new topic
+            updateLectureCounts({ topics: updatedTopics }); // Update total lectures after adding
+        }
     } catch (error) {
       console.error("Error adding topic:", error);
     }
+
   };
 
   if (!subject) return <h2>Loading...</h2>;
@@ -122,143 +135,29 @@ const Subject = () => {
         ➕ Add Topic
       </button>
 
-      <table className="styled-table">
-        <thead>
-          <tr>
-            <th>Topic Name</th>
-            <th>Total Lectures</th>
-            <th>Completed Lectures</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {subject.topics.map((topic) => (
-            <tr key={topic._id}>
-              <td>{topic.name}</td>
-              <td>{topic.totalLectures}</td>
-              <td>{topic.completedLectures}</td>
-              <td>
-                <button
-                  onClick={() => handleIncrease(topic._id)}
-                  className="table-btn arrow-btn"
-                >
-                  <ArrowUp size={20} />
-                </button>
-                <button
-                  onClick={() => handleEdit(topic)}
-                  className="table-btn edit-btn"
-                >
-                  <Pencil size={20} />
-                </button>
-                <button
-                  onClick={() => handleDeleteClick(topic._id)}
-                  className="table-btn delete-btn"
-                >
-                  <Trash2 size={20} />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TopicTable 
+        topics={subject.topics} 
+        onIncrease={handleIncrease} 
+        onEdit={handleEdit} 
+        onDelete={handleDeleteClick} 
+      />
 
-      {isAddModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Add Topic</h3>
-            <form onSubmit={handleAddTopic}>
-              <label>Topic Name</label>
-              <input
-                type="text"
-                value={newTopic.name}
-                onChange={(e) =>
-                  setNewTopic({ ...newTopic, name: e.target.value })
-                }
-                required
-              />
-              <label>Total Lectures</label>
-              <input
-                type="number"
-                value={newTopic.totalLectures}
-                onChange={(e) =>
-                  setNewTopic({
-                    ...newTopic,
-                    totalLectures: parseInt(e.target.value),
-                  })
-                }
-                required
-              />
-              <button type="submit">Add Topic</button>
-            </form>
-          </div>
-        </div>
-      )}
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <button className="close-btn" onClick={() => setIsModalOpen(false)}>
-              ✖
-            </button>
-            <h3>Edit Topic</h3>
-            <form onSubmit={handleEditSubmit}>
-              <label>Topic Name</label>
-              <input
-                type="text"
-                value={editingTopic.name}
-                onChange={(e) =>
-                  setEditingTopic({ ...editingTopic, name: e.target.value })
-                }
-                required
-              />
-              <label>Total Lectures</label>
-              <input
-                type="number"
-                value={editingTopic.totalLectures}
-                onChange={(e) =>
-                  setEditingTopic({
-                    ...editingTopic,
-                    totalLectures: parseInt(e.target.value),
-                  })
-                }
-                required
-              />
-              <label>Completed Lectures</label>
-              <input
-                type="number"
-                value={editingTopic.completedLectures}
-                onChange={(e) =>
-                  setEditingTopic({
-                    ...editingTopic,
-                    completedLectures: parseInt(e.target.value),
-                  })
-                }
-                required
-              />
-              <button type="submit">Save Changes</button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {isDeleteModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Confirm Deletion</h3>
-            <p>Are you sure you want to delete this topic?</p>
-            <div className="modal-buttons">
-              <button className="delete-btn" onClick={handleDeleteConfirm}>
-                Yes, Delete
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setIsDeleteModalOpen(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddTopicModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        onAdd={handleAddTopic} 
+      />
+      <EditTopicModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        topic={editingTopic} 
+        onEdit={handleEditSubmit} 
+      />
+      <DeleteConfirmationModal 
+        isOpen={isDeleteModalOpen} 
+        onClose={() => setIsDeleteModalOpen(false)} 
+        onConfirm={handleDeleteConfirm} 
+      />
     </div>
   );
 };
