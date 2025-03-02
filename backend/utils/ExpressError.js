@@ -1,6 +1,6 @@
-class ExpressError extends Error {    //This line defines a new class called ExpressError which extends the built-in Error class in JavaScript.
+class ExpressError extends Error {
     constructor(statusCode,message) {
-        super();  //The super() call invokes the constructor of the parent class (Error).
+        super();
         this.statusCode = statusCode;
         this.message = message;
     }

@@ -6,23 +6,17 @@ module.exports.createSubject = async (req, res) => {
   try {
     const { name, totalLectures, completedLectures } = req.body;
 
-    // Check if the name and totalLectures are provided
+    // Validate required fields
     if (!name || !totalLectures) {
       return res.status(400).json({ message: "Name and totalLectures are required" });
     }
 
-    // Create a new subject
-    const subject = new Subject({ name, totalLectures, completedLectures});
-
-    // Save subject to the database
+    // Create and save the subject
+    const subject = new Subject({ name, totalLectures, completedLectures });
     await subject.save();
 
-    res.status(201).json({
-      message: "Subject created successfully",
-      subject,
-    });
+    res.status(201).json({ message: "Subject created successfully", subject });
   } catch (error) {
-    console.error("Error creating subject:", error);
     res.status(500).json({ message: "Error creating subject", error: error.message });
   }
 };
@@ -32,13 +26,12 @@ module.exports.getAllSubjects = async (req, res) => {
   try {
     const subjects = await Subject.find({});
 
-    if (!subjects || subjects.length === 0) {
+    if (!subjects.length) {
       return res.status(404).json({ message: "No subjects found" });
     }
 
     res.status(200).json(subjects);
   } catch (error) {
-    console.error("Error fetching subjects:", error);
     res.status(500).json({ message: "Error fetching subjects", error: error.message });
   }
 };
@@ -46,7 +39,6 @@ module.exports.getAllSubjects = async (req, res) => {
 // Get a specific subject by ID
 module.exports.getSubjectById = async (req, res) => {
   try {
-    const subjectId = new mongoose.Types.ObjectId(req.params.id)
     const subject = await Subject.findById(req.params.id).populate("topics");
 
     if (!subject) {
@@ -55,7 +47,6 @@ module.exports.getSubjectById = async (req, res) => {
 
     res.status(200).json(subject);
   } catch (error) {
-    console.error("Error fetching subject:", error);
     res.status(500).json({ message: "Error fetching subject", error: error.message });
   }
 };
@@ -65,7 +56,7 @@ module.exports.updateSubject = async (req, res) => {
   try {
     const { name, totalLectures, completedLectures } = req.body;
 
-    // Ensure that required fields are provided
+    // Validate required fields
     if (!name || !totalLectures || completedLectures === undefined) {
       return res.status(400).json({ message: "All fields (name, totalLectures, completedLectures) are required" });
     }
@@ -81,12 +72,8 @@ module.exports.updateSubject = async (req, res) => {
       return res.status(404).json({ message: "Subject not found" });
     }
 
-    res.status(200).json({
-      message: "Subject updated successfully",
-      updatedSubject,
-    });
+    res.status(200).json({ message: "Subject updated successfully", updatedSubject });
   } catch (error) {
-    console.error("Error updating subject:", error);
     res.status(500).json({ message: "Error updating subject", error: error.message });
   }
 };
@@ -102,7 +89,6 @@ module.exports.deleteSubject = async (req, res) => {
 
     res.status(200).json({ message: "Subject deleted successfully" });
   } catch (error) {
-    console.error("Error deleting subject:", error);
     res.status(500).json({ message: "Error deleting subject", error: error.message });
   }
 };
