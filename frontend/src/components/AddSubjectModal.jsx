@@ -19,7 +19,7 @@ const AddSubjectModal = ({ isOpen, onClose, onAdd }) => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal">
         <h2>Add Subject</h2>
         <form onSubmit={handleSubmit}>
           <label>

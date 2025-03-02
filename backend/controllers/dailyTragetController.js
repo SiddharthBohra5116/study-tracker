@@ -2,8 +2,8 @@ const DailyTarget = require("../models/DailyTarget");
 
 module.exports.createDailyTarget = async (req, res) => {
   try {
-    const { topicId, plannedLectures } = req.body;
-    const target = new DailyTarget({ topic: topicId, plannedLectures, completedLectures: 0 });
+    const { targetName } = req.body;
+    const target = new DailyTarget({ targetName });
     await target.save();
     res.status(201).json({ message: "Daily target created successfully", target });
   } catch (error) {
@@ -14,7 +14,7 @@ module.exports.createDailyTarget = async (req, res) => {
 
 module.exports.getAllDailyTargets = async (req, res) => {
   try {
-    const targets = await DailyTarget.find().populate("topic");
+    const targets = await DailyTarget.find();
     res.status(200).json(targets);
   } catch (error) {
     console.error(error);
@@ -43,7 +43,6 @@ module.exports.deleteDailyTarget = async (req, res) => {
     }
     res.status(200).json({ message: "Daily target deleted successfully" });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Error deleting daily target", error });
   }
 };

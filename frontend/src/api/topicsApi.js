@@ -17,8 +17,9 @@ export const createTopic = async (subjectId, topicData) => {
 };
 
 // Update a topic
-export const updateTopic = async (id, updatedData) => {
-  const response = await axios.put(`${BASE_URL}/${id}`, updatedData);
+export const updateTopic = async (subjectId, topicId, updatedData) => {
+
+  const response = await axios.put(`${BASE_URL}/${subjectId}/topics/${topicId}`, updatedData);
   return response.data;
 };
 

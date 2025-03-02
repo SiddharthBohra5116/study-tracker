@@ -1,13 +1,13 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./Navbar.css"; // Import the CSS file
 
 const Navbar = () => {
   return (
     <nav className="navbar">
-      <h1 className="nav-heading">📚 GATE Progress Tracker</h1>
+      <h1 className="nav-heading">📚 Study Progress Tracker</h1>
       <div className="nav-links">
-        <Link to="/" className="active">Dashboard</Link>
-        <Link to="/dailytargets">Daily Targets</Link>
+        <NavLink to="/" exact activeClassName="active">Dashboard</NavLink>
+        <NavLink to="/dailytargets" activeClassName="active">Daily Targets</NavLink>
       </div>
     </nav>
   );

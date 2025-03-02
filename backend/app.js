@@ -4,7 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 const subjectRoutes = require("./routes/subject");
 const topicRoutes = require("./routes/topic");
-// const dailyTargetRoutes = require("./routes/dailyTarget");
+const dailyTargetRoutes = require("./routes/dailyTarget");
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 // Routes
 app.use("/subjects", subjectRoutes);
-// app.use("/xyz/dailytargets",dailyTargetRoutes)
+app.use("/dailytargets",dailyTargetRoutes);
 app.use("/subjects/:subjectId/topics", topicRoutes);
 
 

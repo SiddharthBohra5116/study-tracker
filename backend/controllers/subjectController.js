@@ -4,7 +4,7 @@ const Subject = require("../models/Subject");
 // Create a new subject
 module.exports.createSubject = async (req, res) => {
   try {
-    const { name, totalLectures } = req.body;
+    const { name, totalLectures, completedLectures } = req.body;
 
     // Check if the name and totalLectures are provided
     if (!name || !totalLectures) {
@@ -12,7 +12,7 @@ module.exports.createSubject = async (req, res) => {
     }
 
     // Create a new subject
-    const subject = new Subject({ name, totalLectures, completedLectures: 0 });
+    const subject = new Subject({ name, totalLectures, completedLectures});
 
     // Save subject to the database
     await subject.save();

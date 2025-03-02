@@ -11,10 +11,20 @@ const EditTopicModal = ({ isOpen, onClose, topic, onEdit }) => {
 
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    onEdit(editingTopic); // Ensure onEdit is called with the editingTopic
-    onClose();
-  };
+    if (e) {
+        e.preventDefault();
+    }
+    
+    onClose(); // Close the modal first
+    
+    setTimeout(() => {
+        setEditingTopic((prevTopic) => {
+            onEdit({ ...prevTopic }); // Update the parent state after modal is closed
+            return prevTopic; // Keep state consistent
+        });
+    }, 0);
+};
+
 
 
   if (!isOpen || !editingTopic) return null;

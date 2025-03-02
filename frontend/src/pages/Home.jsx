@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CircularProgressBar from "../components/ProgressBar";
-import { getSubjects } from "../api/subjectApi";
+import { getSubjects,createSubject, updateSubject, deleteSubject } from "../api/subjectApi"; // Added deleteSubject import
+
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import "../css/table.css";
 import AddSubjectModal from "../components/AddSubjectModal";
@@ -44,9 +45,9 @@ const Home = () => {
     }
   };
 
-  const handleDeleteSubject = async (subjectId) => {
+const handleDeleteSubject = async (subjectId) => {
     try {
-      const response = await deleteSubject(subjectId); // Assuming deleteSubject is defined in subjectApi.js
+      const response = await deleteSubject(subjectId);
       if (response.success) {
         const updatedSubjects = subjects.filter(
           (subject) => subject._id !== subjectId
@@ -56,6 +57,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error deleting subject:", error);
     }
+    setIsDeleteModalOpen(false);
   };
 
   const handleDeleteClick = (subjectId) => {
@@ -70,26 +72,32 @@ const Home = () => {
       try {
         const data = await getSubjects();
         setSubjects(data);
-
+  
         let total = 0;
         let completed = 0;
-        data.forEach((subject) => {
-          total += subject.totalLectures;
-          completed += subject.completedLectures;
-        });
-
-        setTotalLectures(total);
-        setCompletedLectures(completed);
+        
+        if (data && data.length > 0) {
+          data.forEach((subject) => {
+            total += subject.totalLectures;
+            completed += subject.completedLectures;
+          });
+          setTotalLectures(total);
+          setCompletedLectures(completed);
+        } else {
+          setTotalLectures(0);
+          setCompletedLectures(0);
+        }
       } catch (error) {
         console.error("Error fetching subjects:", error);
       }
     };
-
+  
     fetchSubjects();
-  }, []);
+  }, [subjects]); // Use empty dependency array to call this effect once on component mount // Add subjects to the dependency array
+
 
   return (
-    <div>
+    <div className="container">
       <h1>Dashboard</h1>
 
       {totalLectures > 0 && (
@@ -100,6 +108,14 @@ const Home = () => {
       )}
 
       <h2>Subjects</h2>
+      {subjects.length === 0 && (
+        <div>
+          <p style={{ fontSize: "18px", fontWeight: "bold", color: "red" }}>
+            No subjects available. Please add a subject.
+          </p>
+        </div>
+      )}
+
       <button
         onClick={() => setIsAddModalOpen(true)}
         style={{ marginLeft: "10px" }}
@@ -124,7 +140,7 @@ const Home = () => {
               <td>
                 <button
                   className="table-btn arrow-btn"
-                  onClick={() => navigate(`/subject/${subject._id}`)}
+                  onClick={() => navigate(`/subjects/${subject._id}`)}
                 >
                   <Eye />
                 </button>

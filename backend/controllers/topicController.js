@@ -34,23 +34,27 @@ module.exports.getTopicsBySubject = async (req, res) => {
 
 module.exports.updateTopic = async (req, res) => {
   try {
-    const { subjectId, topicId } = req.params; // Get both subjectId and topicId from params
-    const updatedTopic = await Topic.findByIdAndUpdate(topicId, req.body, { new: true });
+    const { id } = req.params; // Get topic ID from params
+    console.log("Request payload for topic update:", req.body);
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: "Request body is empty" });
+    }
+
+    // Update the entire topic document in the Topic collection
+    const updatedTopic = await Topic.findByIdAndUpdate(id, req.body, { new: true });
+
     if (!updatedTopic) {
       return res.status(404).json({ message: "Topic not found" });
     }
-    await Subject.findOneAndUpdate(
-      { _id: req.params.subjectId, "topics._id": req.params.id }, // Find subject containing the topic
-      { $set: { "topics.$.name": req.body.name } }, // Update specific field in the topic
-      { new: true }
-    );
-    
+
     res.status(200).json({ message: "Topic updated successfully", updatedTopic });
   } catch (error) {
-    console.error(error);
+    console.error("Error updating topic:", error);
     res.status(500).json({ message: "Error updating topic", error });
   }
 };
+
 
 
 
